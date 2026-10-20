@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\AppointmentAvailability;
-use App\Mail\AppointmentConfirmation;
+use App\AppointmentBooking;
+use App\Enums\AppointmentStatus;
+use App\Http\Requests\StorePaymentProofRequest;
 use App\Models\Appointment;
 use App\Models\Service;
+use App\Models\Technician;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class AppointmentController extends Controller
@@ -26,6 +27,7 @@ class AppointmentController extends Controller
                 ->orderBy('category')
                 ->orderBy('name')
                 ->get(),
+            'technicians' => Technician::query()->where('is_active', true)->orderBy('name')->get(),
             'today' => Carbon::now(config('booking.timezone'))->toDateString(),
         ]);
     }
@@ -38,16 +40,17 @@ class AppointmentController extends Controller
             'date' => ['required', 'date_format:Y-m-d', 'after_or_equal:'.$minimumDate],
             'services' => ['required', 'array', 'min:1'],
             'services.*' => ['required', 'integer', 'distinct', Rule::exists('services', 'id')->where('is_active', true)],
+            'technician_id' => ['nullable', 'integer', Rule::exists('technicians', 'id')->where('is_active', true)],
         ]);
 
         $services = Service::query()->whereKey($validated['services'])->where('is_active', true)->get();
 
         return response()->json([
-            'slots' => $availability->availableSlots($validated['date'], $services),
+            'slots' => $availability->availableSlots($validated['date'], $services, $validated['technician_id'] ?? null),
         ]);
     }
 
-    public function store(Request $request, AppointmentAvailability $availability): RedirectResponse
+    public function store(Request $request, AppointmentBooking $booking): RedirectResponse
     {
         $minimumDate = Carbon::now(config('booking.timezone'))->toDateString();
 
@@ -59,58 +62,36 @@ class AppointmentController extends Controller
             'start_time' => ['required', 'date_format:H:i'],
             'service_ids' => ['required', 'array', 'min:1'],
             'service_ids.*' => ['required', 'integer', 'distinct', Rule::exists('services', 'id')->where('is_active', true)],
+            'technician_id' => ['nullable', 'integer', Rule::exists('technicians', 'id')->where('is_active', true)],
         ]);
 
         $services = Service::query()->whereKey($validated['service_ids'])->where('is_active', true)->get();
-        $duration = (int) $services->sum('duration_minutes');
-        $totalPrice = round((float) $services->sum(fn (Service $service): string => $service->price), 2);
-        $date = $validated['appointment_date'];
+        $appointment = $booking->book($validated, $services);
 
-        $appointment = DB::transaction(function () use ($availability, $date, $duration, $services, $totalPrice, $validated): Appointment {
-            DB::table('appointment_day_locks')->insertOrIgnore([
-                'appointment_date' => $date,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-            DB::table('appointment_day_locks')
-                ->where('appointment_date', $date)
-                ->lockForUpdate()
-                ->first();
-
-            if (! $availability->isAvailable($date, $validated['start_time'], $duration)) {
-                throw ValidationException::withMessages([
-                    'start_time' => 'Ese horario ya no está disponible. Elige otra hora.',
-                ]);
-            }
-
-            $appointment = Appointment::query()->create([
-                'customer_name' => $validated['customer_name'],
-                'customer_email' => $validated['customer_email'],
-                'customer_phone' => $validated['customer_phone'],
-                'appointment_date' => $date,
-                'starts_at' => $validated['start_time'],
-                'ends_at' => Carbon::parse($date.' '.$validated['start_time'], config('booking.timezone'))
-                    ->addMinutes($duration)
-                    ->format('H:i:s'),
-                'total_minutes' => $duration,
-                'total_price' => $totalPrice,
-                'status' => 'confirmed',
-            ]);
-
-            $appointment->services()->attach($services->mapWithKeys(fn (Service $service): array => [
-                $service->id => [
-                    'service_name' => $service->name,
-                    'duration_minutes' => $service->duration_minutes,
-                    'price' => $service->price,
-                ],
-            ])->all());
-
-            return $appointment;
-        });
-
-        $appointment->load('services');
-        Mail::to($appointment->customer_email)->send(new AppointmentConfirmation($appointment));
+        if ($appointment->deposit_required) {
+            return redirect(URL::signedRoute('appointments.payment', $appointment));
+        }
 
         return redirect()->route('appointments.index')->with('success', 'Tu cita quedó confirmada. Te enviamos los detalles por correo.');
+    }
+
+    public function payment(Appointment $appointment): View
+    {
+        return view('appointments.payment', [
+            'appointment' => $appointment->load(['services', 'paymentProof']),
+            'bank' => config('booking.bank'),
+            'uploadUrl' => URL::signedRoute('appointments.proof.store', $appointment),
+            'canUpload' => $appointment->status === AppointmentStatus::PendingPaymentValidation
+                && $appointment->paymentProof === null
+                && $appointment->expires_at?->isFuture(),
+        ]);
+    }
+
+    public function storeProof(StorePaymentProofRequest $request, Appointment $appointment, AppointmentBooking $booking): RedirectResponse
+    {
+        $booking->attachProof($appointment, $request->file('proof'));
+
+        return redirect(URL::signedRoute('appointments.payment', $appointment))
+            ->with('success', 'Recibimos tu comprobante. Te avisaremos por correo cuando lo validemos.');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\AppointmentStatus;
 use App\Models\Appointment;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -26,7 +27,17 @@ class AppointmentFactory extends Factory
             'ends_at' => '11:00:00',
             'total_minutes' => 60,
             'total_price' => 500,
-            'status' => 'confirmed',
+            'status' => AppointmentStatus::Confirmed,
         ];
+    }
+
+    public function pendingPayment(int $minutes = 20): static
+    {
+        return $this->state([
+            'status' => AppointmentStatus::PendingPaymentValidation,
+            'deposit_required' => true,
+            'deposit_amount' => 150,
+            'expires_at' => now()->addMinutes($minutes),
+        ]);
     }
 }

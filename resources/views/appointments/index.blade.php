@@ -73,6 +73,7 @@
                 </div>
                 <div class="schedule-controls">
                     <label class="field date-field"><span>Fecha de tu cita</span><input type="date" name="appointment_date" min="{{ $today }}" value="{{ old('appointment_date') }}" required>@error('appointment_date')<small class="field-error">{{ $message }}</small>@enderror</label>
+                    <label class="field"><span>Manicurista</span><select name="technician_id"><option value="">Primera disponible</option>@foreach ($technicians as $technician)<option value="{{ $technician->id }}" @selected((string) old('technician_id') === (string) $technician->id)>{{ $technician->name }}</option>@endforeach</select>@error('technician_id')<small class="field-error">{{ $message }}</small>@enderror</label>
                     <div class="time-field"><span>Horarios disponibles</span><div class="time-grid" id="time-slots" aria-live="polite"><p class="slot-prompt">Primero elige servicios y fecha.</p></div>@error('start_time')<small class="field-error">{{ $message }}</small>@enderror</div>
                 </div>
                 <input type="hidden" name="start_time" id="start-time" value="{{ old('start_time') }}">
@@ -88,7 +89,7 @@
                     <label class="field"><span>Correo electrónico</span><input type="email" name="customer_email" value="{{ old('customer_email') }}" placeholder="tu@correo.com" autocomplete="email" required>@error('customer_email')<small class="field-error">{{ $message }}</small>@enderror</label>
                     <label class="field"><span>Teléfono</span><input type="tel" name="customer_phone" value="{{ old('customer_phone') }}" placeholder="10 dígitos" autocomplete="tel" required>@error('customer_phone')<small class="field-error">{{ $message }}</small>@enderror</label>
                 </div>
-                <div class="submit-row"><p>Al confirmar recibirás un correo con los detalles de tu cita.</p><button type="submit" class="submit-button">Confirmar cita <span aria-hidden="true">↗</span></button></div>
+                <div class="submit-row"><p>Si es tu primera visita te pediremos un depósito por transferencia para apartar tu horario; si ya nos visitaste, tu cita queda confirmada al instante.</p><button type="submit" class="submit-button">Confirmar cita <span aria-hidden="true">↗</span></button></div>
             </section>
         </form>
     </main>

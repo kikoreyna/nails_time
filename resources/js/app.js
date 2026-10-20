@@ -2,6 +2,7 @@ const bookingForm = document.querySelector('.booking-form');
 
 if (bookingForm) {
 	const dateInput = bookingForm.querySelector('input[name="appointment_date"]');
+	const technicianSelect = bookingForm.querySelector('select[name="technician_id"]');
 	const serviceInputs = [...bookingForm.querySelectorAll('input[name="service_ids[]"]')];
 	const slotContainer = document.querySelector('#time-slots');
 	const startTimeInput = document.querySelector('#start-time');
@@ -81,6 +82,9 @@ if (bookingForm) {
 
 		const parameters = new URLSearchParams({ date });
 		selected.forEach((input) => parameters.append('services[]', input.value));
+		if (technicianSelect?.value) {
+			parameters.append('technician_id', technicianSelect.value);
+		}
 
 		try {
 			const response = await fetch(`${bookingForm.dataset.availabilityUrl}?${parameters}`, {
@@ -103,6 +107,7 @@ if (bookingForm) {
 
 	serviceInputs.forEach((input) => input.addEventListener('change', loadAvailability));
 	dateInput.addEventListener('change', loadAvailability);
+	technicianSelect?.addEventListener('change', loadAvailability);
 	bookingForm.addEventListener('submit', (event) => {
 		if (selectedServices().length === 0 || !startTimeInput.value) {
 			event.preventDefault();
@@ -121,4 +126,25 @@ if (bookingForm) {
 			loadAvailability();
 		}
 	}, 30000);
+}
+
+const countdown = document.querySelector('[data-expires-at]');
+
+if (countdown) {
+	const expiresAt = new Date(countdown.dataset.expiresAt).getTime();
+	const output = countdown.querySelector('[data-countdown]');
+
+	const tick = () => {
+		const remaining = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
+		output.textContent = `${String(Math.floor(remaining / 60)).padStart(2, '0')}:${String(remaining % 60).padStart(2, '0')}`;
+
+		if (remaining === 0) {
+			window.location.reload();
+			return;
+		}
+
+		window.setTimeout(tick, 1000);
+	};
+
+	tick();
 }

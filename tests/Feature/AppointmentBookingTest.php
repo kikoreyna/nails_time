@@ -2,9 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Enums\AppointmentStatus;
 use App\Mail\AppointmentConfirmation;
 use App\Models\Appointment;
+use App\Models\Client;
 use App\Models\Service;
+use App\Models\Technician;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
@@ -12,6 +15,13 @@ use Tests\TestCase;
 class AppointmentBookingTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Technician::factory()->create();
+    }
 
     public function test_public_booking_page_shows_service_and_date_selection(): void
     {
@@ -48,6 +58,12 @@ class AppointmentBookingTest extends TestCase
         $this->travelTo('2026-09-28 08:00:00');
         $manicure = Service::factory()->create(['duration_minutes' => 45, 'price' => 350]);
         $pedicure = Service::factory()->create(['duration_minutes' => 30, 'price' => 420]);
+        $client = Client::factory()->create(['email' => 'ana@example.com']);
+        Appointment::factory()->create([
+            'client_id' => $client->id,
+            'appointment_date' => '2026-08-01',
+            'status' => AppointmentStatus::Completed,
+        ]);
 
         $response = $this->post('/appointments', [
             'customer_name' => 'Ana Perez',
@@ -61,7 +77,7 @@ class AppointmentBookingTest extends TestCase
         $response->assertRedirect(route('appointments.index'))
             ->assertSessionHas('success');
 
-        $appointment = Appointment::query()->firstOrFail();
+        $appointment = Appointment::query()->latest('id')->firstOrFail();
         $this->assertSame('12:15:00', $appointment->ends_at);
         $this->assertSame(75, $appointment->total_minutes);
         $this->assertSame('770.00', $appointment->total_price);

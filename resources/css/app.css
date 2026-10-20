@@ -170,3 +170,44 @@ button, input { font: inherit; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+.field select { width: 100%; min-height: 48px; padding: 0 13px; border: 1px solid #c7d0c5; border-radius: 2px; outline: none; background: var(--white); color: var(--ink); }
+.field select:focus, .field textarea:focus { border-color: var(--tomato); box-shadow: 0 0 0 3px rgb(214 78 57 / 12%); }
+.field textarea { width: 100%; padding: 10px 13px; border: 1px solid #c7d0c5; border-radius: 2px; outline: none; background: var(--white); color: var(--ink); }
+.panel-page { width: min(100% - 44px, 1040px); margin: 0 auto; padding: 40px 0 64px; }
+.panel-page h1 { margin: 0 0 6px; font-size: 32px; }
+.panel-card { margin-top: 24px; padding: 28px; border: 1px solid var(--line); background: var(--white); }
+.panel-card h2 { margin: 0 0 14px; font-size: 20px; }
+.bank-data { display: grid; gap: 8px; margin: 0; }
+.bank-data div { display: flex; justify-content: space-between; gap: 18px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.bank-data dt { color: var(--muted); font-size: 13px; }
+.bank-data dd { margin: 0; font-weight: 700; word-break: break-all; }
+.countdown { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 16px 20px; background: var(--tomato); color: white; }
+.countdown strong { font-size: 32px; font-variant-numeric: tabular-nums; }
+.status-badge { display: inline-block; padding: 3px 10px; border: 1px solid var(--line); font-size: 12px; font-weight: 700; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.admin-table th, .admin-table td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.admin-actions { display: grid; gap: 8px; min-width: 220px; }
+.admin-actions form { display: grid; gap: 6px; }
+.secondary-button { min-height: 40px; padding: 0 16px; border: 1px solid var(--ink); background: transparent; color: var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; }
+.admin-bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.calendar-page { width: min(100% - 44px, 1400px); }
+.calendar-nav-links { display: flex; gap: 10px; align-items: center; }
+.calendar-nav-links .secondary-button, .calendar-week-nav .secondary-button { display: inline-flex; align-items: center; text-decoration: none; color: var(--ink); }
+.calendar-toolbar { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; margin-top: 24px; }
+.calendar-week-nav { display: flex; align-items: center; gap: 10px; }
+.calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
+.calendar-day { min-height: 220px; padding: 10px; border: 1px solid var(--line); background: var(--white); }
+.calendar-day.is-today { border-color: var(--tomato); box-shadow: 0 0 0 2px rgb(214 78 57 / 15%); }
+.calendar-day > header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 10px; text-transform: capitalize; color: var(--muted); font-size: 13px; }
+.calendar-day > header strong { color: var(--ink); font-size: 22px; }
+.calendar-appointment { display: grid; gap: 3px; margin-bottom: 8px; padding: 8px; border-left: 4px solid var(--ink); background: var(--paper); font-size: 12px; }
+.calendar-appointment small { color: var(--muted); }
+.calendar-appointment.status-confirmed { border-left-color: #2f7d4f; }
+.calendar-appointment.status-pending_payment_validation { border-left-color: #d9a21b; }
+.calendar-appointment.status-completed { border-left-color: #6b7280; }
+.calendar-appointment.status-no_show { border-left-color: var(--tomato); }
+.calendar-empty { margin: 0; color: var(--muted); font-size: 12px; }
+.calendar-close-actions { display: grid; gap: 6px; margin-top: 6px; }
+.calendar-close-actions .secondary-button { min-height: 32px; padding: 0 10px; font-size: 12px; }
+@media (max-width: 900px) { .calendar-grid { grid-template-columns: 1fr; } .calendar-day { min-height: 0; } }
