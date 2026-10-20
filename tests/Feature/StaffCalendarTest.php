@@ -126,6 +126,22 @@ class StaffCalendarTest extends TestCase
         $this->assertSame(AppointmentStatus::NoShow, $other->fresh()->status);
     }
 
+    public function test_sidebar_shows_links_by_role_and_pending_review_count(): void
+    {
+        Appointment::factory()->pendingPayment()->create(['technician_id' => $this->ana->id])
+            ->paymentProof()->create(['image_path' => 'payment-proofs/x.png', 'uploaded_at' => now()]);
+
+        $this->actingAs(User::factory()->admin()->create())->get(route('admin.calendar'))
+            ->assertSee('Comprobantes')
+            ->assertSee('aria-label="1 pendientes"', false)
+            ->assertSee('Administrador');
+
+        $this->actingAs(User::factory()->create(['technician_id' => $this->ana->id]))->get(route('admin.calendar'))
+            ->assertSee('Calendario')
+            ->assertSee('MI AGENDA')
+            ->assertDontSee('Comprobantes');
+    }
+
     public function test_regular_users_cannot_log_in_to_the_panel(): void
     {
         User::factory()->create(['email' => 'cliente@salon.test']);

@@ -36,4 +36,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Technician::class);
     }
+
+    public function canAccessPanel(): bool
+    {
+        return $this->is_admin || ($this->technician_id !== null && $this->technician?->is_active === true);
+    }
 }

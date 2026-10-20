@@ -12,7 +12,7 @@ class EnsureUserIsStaff
     {
         $user = $request->user();
 
-        abort_unless($user && ($user->is_admin || $user->technician_id !== null), 403);
+        abort_unless($user?->canAccessPanel(), 403);
 
         return $next($request);
     }

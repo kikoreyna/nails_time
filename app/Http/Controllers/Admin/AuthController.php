@@ -28,7 +28,7 @@ class AuthController extends Controller
 
         $user = $request->user();
 
-        if (! $user->is_admin && $user->technician_id === null) {
+        if (! $user->canAccessPanel()) {
             Auth::logout();
 
             return back()->withInput($request->only('email'))->withErrors(['email' => 'Credenciales incorrectas.']);
