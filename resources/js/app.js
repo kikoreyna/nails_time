@@ -148,3 +148,13 @@ if (countdown) {
 
 	tick();
 }
+
+const sidebarToggle = document.querySelector('[data-sidebar-toggle]');
+
+if (sidebarToggle) {
+	sidebarToggle.addEventListener('click', () => {
+		const isOpen = document.querySelector('#admin-sidebar').classList.toggle('is-open');
+
+		sidebarToggle.setAttribute('aria-expanded', String(isOpen));
+	});
+}

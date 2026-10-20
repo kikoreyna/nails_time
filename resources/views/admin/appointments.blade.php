@@ -1,20 +1,6 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Citas | Administración Nails Time</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="booking-page">
-    <main class="panel-page">
-        <div class="admin-bar">
-            <div><p class="eyebrow">ADMINISTRACIÓN</p><h1>Comprobantes por validar</h1></div>
-            <div class="calendar-nav-links">
-                <a href="{{ route('admin.calendar') }}" class="secondary-button">Calendario</a>
-                <form method="POST" action="{{ route('admin.logout') }}">@csrf<button type="submit" class="secondary-button">Salir</button></form>
-            </div>
-        </div>
+<x-admin-layout title="Comprobantes">
+    <div class="panel-page">
+        <div class="admin-bar"><div><p class="eyebrow">ADMINISTRACIÓN</p><h1>Comprobantes por validar</h1></div></div>
 
         @if (session('success'))
             <div class="notice notice-success" role="status">{{ session('success') }}</div>
@@ -74,6 +60,5 @@
                 </tbody>
             </table>
         </section>
-    </main>
-</body>
-</html>
+    </div>
+</x-admin-layout>

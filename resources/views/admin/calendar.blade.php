@@ -1,23 +1,9 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Calendario | Nails Time</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="booking-page">
-    <main class="panel-page calendar-page">
+<x-admin-layout title="Calendario">
+    <div class="panel-page calendar-page">
         <div class="admin-bar">
             <div>
                 <p class="eyebrow">{{ auth()->user()->is_admin ? 'ADMINISTRACIÓN' : 'MI AGENDA' }}</p>
                 <h1>Calendario{{ $ownTechnician ? ' · '.$ownTechnician->name : '' }}</h1>
-            </div>
-            <div class="calendar-nav-links">
-                @if (auth()->user()->is_admin)
-                    <a href="{{ route('admin.appointments.index') }}" class="secondary-button">Comprobantes</a>
-                @endif
-                <form method="POST" action="{{ route('admin.logout') }}">@csrf<button type="submit" class="secondary-button">Salir</button></form>
             </div>
         </div>
 
@@ -82,6 +68,5 @@
                 </section>
             @endforeach
         </div>
-    </main>
-</body>
-</html>
+    </div>
+</x-admin-layout>
