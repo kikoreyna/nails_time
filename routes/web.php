@@ -3,6 +3,8 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CalendarController;
 use App\Http\Controllers\Admin\PaymentReviewController;
+use App\Http\Controllers\Admin\ServiceController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\TechnicianController;
 use App\Http\Controllers\AppointmentController;
 use Illuminate\Support\Facades\Route;
@@ -37,6 +39,9 @@ Route::prefix('admin')->group(function () {
 
     Route::middleware(['auth', 'admin'])->name('admin.')->group(function () {
         Route::resource('technicians', TechnicianController::class)->except('show');
+        Route::resource('services', ServiceController::class)->except('show');
+        Route::get('/settings', [SettingController::class, 'edit'])->name('settings.edit');
+        Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
         Route::get('/appointments', [PaymentReviewController::class, 'index'])->name('appointments.index');
         Route::get('/payment-proofs/{proof}', [PaymentReviewController::class, 'proof'])->name('proofs.show');
         Route::post('/appointments/{appointment}/approve', [PaymentReviewController::class, 'approve'])->name('appointments.approve');

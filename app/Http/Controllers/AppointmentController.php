@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AppointmentAvailability;
 use App\AppointmentBooking;
 use App\Enums\AppointmentStatus;
+use App\Enums\Currency;
 use App\Http\Requests\StorePaymentProofRequest;
 use App\Models\Appointment;
 use App\Models\Service;
@@ -29,6 +30,7 @@ class AppointmentController extends Controller
                 ->get(),
             'technicians' => Technician::query()->where('is_active', true)->orderBy('name')->get(),
             'today' => Carbon::now(config('booking.timezone'))->toDateString(),
+            'currency' => Currency::current(),
         ]);
     }
 

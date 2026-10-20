@@ -12,7 +12,7 @@
                 <li style="padding:5px 0;">{{ $service->pivot->service_name }} · {{ $service->pivot->duration_minutes }} min</li>
             @endforeach
         </ul>
-        <p style="border-top:1px solid #e5e7e2;padding-top:18px;"><strong>Duración:</strong> {{ $appointment->total_minutes }} min<br><strong>Total:</strong> ${{ number_format((float) $appointment->total_price, 2) }}</p>
+        <p style="border-top:1px solid #e5e7e2;padding-top:18px;"><strong>Duración:</strong> {{ $appointment->total_minutes }} min<br><strong>Total:</strong> {{ \App\Enums\Currency::current()->format($appointment->total_price) }}</p>
         <p style="font-size:13px;color:#64716c;margin-top:28px;">Si necesitas cambiar tu cita, responde a este correo.</p>
     </main>
 </body>

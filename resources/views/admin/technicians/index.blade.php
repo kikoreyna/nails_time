@@ -21,11 +21,15 @@
                         <td>{{ $technician->user?->email ?? 'Sin acceso' }}</td>
                         <td>{{ $technician->appointments_count }}</td>
                         <td>
-                            <div class="admin-actions">
-                                <a href="{{ route('admin.technicians.edit', $technician) }}" class="secondary-button" style="display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:var(--ink);">Editar</a>
+                            <div class="icon-actions">
+                                <a href="{{ route('admin.technicians.edit', $technician) }}" class="icon-button" title="Editar" aria-label="Editar {{ $technician->name }}">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                                </a>
                                 <form method="POST" action="{{ route('admin.technicians.destroy', $technician) }}" onsubmit="return confirm('¿Eliminar a {{ $technician->name }}?')">
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="secondary-button">Eliminar</button>
+                                    <button type="submit" class="icon-button is-danger" title="Eliminar" aria-label="Eliminar {{ $technician->name }}">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/></svg>
+                                    </button>
                                 </form>
                             </div>
                         </td>

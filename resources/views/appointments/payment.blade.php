@@ -14,7 +14,7 @@
     <main class="panel-page">
         <p class="eyebrow">TU RESERVA</p>
         <h1>{{ $appointment->appointment_date->format('d/m/Y') }} · {{ substr($appointment->starts_at, 0, 5) }}</h1>
-        <p>{{ $appointment->services->pluck('pivot.service_name')->join(', ') }} · {{ $appointment->total_minutes }} min · Total ${{ number_format((float) $appointment->total_price, 2) }}</p>
+        <p>{{ $appointment->services->pluck('pivot.service_name')->join(', ') }} · {{ $appointment->total_minutes }} min · Total {{ \App\Enums\Currency::current()->format($appointment->total_price) }}</p>
 
         @if (session('success'))
             <div class="notice notice-success" role="status">{{ session('success') }}</div>
@@ -26,7 +26,7 @@
             </div>
 
             <section class="panel-card">
-                <h2>1. Transfiere tu depósito de ${{ number_format((float) $appointment->deposit_amount, 2) }}</h2>
+                <h2>1. Transfiere tu depósito de {{ \App\Enums\Currency::current()->format($appointment->deposit_amount) }}</h2>
                 <dl class="bank-data">
                     <div><dt>Banco</dt><dd>{{ $bank['bank_name'] }}</dd></div>
                     <div><dt>Titular</dt><dd>{{ $bank['account_holder'] }}</dd></div>

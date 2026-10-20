@@ -38,7 +38,7 @@
             <div class="notice notice-success" role="status">{{ session('success') }}</div>
         @endif
 
-        <form class="booking-form" method="POST" action="{{ route('appointments.store') }}" data-availability-url="{{ route('appointments.availability') }}" data-today="{{ $today }}">
+        <form class="booking-form" method="POST" action="{{ route('appointments.store') }}" data-availability-url="{{ route('appointments.availability') }}" data-today="{{ $today }}" data-currency="{{ $currency->value }}" data-locale="{{ $currency->locale() }}">
             @csrf
             <section class="form-section service-section">
                 <div class="section-heading">
@@ -57,13 +57,13 @@
                                 <strong>{{ $service->name }}</strong>
                                 <span class="service-description">{{ $service->description }}</span>
                             </span>
-                            <span class="service-meta"><strong>${{ number_format((float) $service->price, 0) }}</strong><small>{{ $service->duration_minutes }} min</small></span>
+                            <span class="service-meta"><strong>{{ $currency->format($service->price, 0) }}</strong><small>{{ $service->duration_minutes }} min</small></span>
                         </label>
                     @empty
                         <p class="empty-services">Estamos actualizando el catálogo. Escríbenos para agendar.</p>
                     @endforelse
                 </div>
-                <div class="selection-summary"><span id="selected-count">0 servicios seleccionados</span><strong id="selection-total">$0 · 0 min</strong></div>
+                <div class="selection-summary"><span id="selected-count">0 servicios seleccionados</span><strong id="selection-total">{{ $currency->format(0, 0) }} · 0 min</strong></div>
             </section>
 
             <section class="form-section schedule-section">

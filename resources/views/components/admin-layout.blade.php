@@ -45,6 +45,12 @@
                     <a href="{{ route('admin.technicians.index') }}" @class(['admin-nav-link', 'is-active' => request()->routeIs('admin.technicians.*')])>
                         <span aria-hidden="true">☺</span> Manicuristas
                     </a>
+                    <a href="{{ route('admin.services.index') }}" @class(['admin-nav-link', 'is-active' => request()->routeIs('admin.services.*')])>
+                        <span aria-hidden="true">✎</span> Servicios
+                    </a>
+                    <a href="{{ route('admin.settings.edit') }}" @class(['admin-nav-link', 'is-active' => request()->routeIs('admin.settings.*')])>
+                        <span aria-hidden="true">⚙</span> Configuración
+                    </a>
                 @endif
                 <a href="{{ route('appointments.index') }}" class="admin-nav-link" target="_blank" rel="noopener">
                     <span aria-hidden="true">↗</span> Ver sitio de reservas

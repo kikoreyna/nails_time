@@ -12,8 +12,8 @@
             <tr><td style="color:#64716c;">Teléfono</td><td>{{ $appointment->customer_phone }}</td></tr>
             <tr><td style="color:#64716c;">Correo</td><td>{{ $appointment->customer_email }}</td></tr>
             <tr><td style="color:#64716c;">Fecha y hora</td><td>{{ $appointment->appointment_date->format('d/m/Y') }} · {{ substr($appointment->starts_at, 0, 5) }} – {{ substr($appointment->ends_at, 0, 5) }}</td></tr>
-            <tr><td style="color:#64716c;">Monto total</td><td>${{ number_format((float) $appointment->total_price, 2) }}</td></tr>
-            <tr><td style="color:#64716c;">Depósito esperado</td><td><strong>${{ number_format((float) $appointment->deposit_amount, 2) }}</strong></td></tr>
+            <tr><td style="color:#64716c;">Monto total</td><td>{{ \App\Enums\Currency::current()->format($appointment->total_price) }}</td></tr>
+            <tr><td style="color:#64716c;">Depósito esperado</td><td><strong>{{ \App\Enums\Currency::current()->format($appointment->deposit_amount) }}</strong></td></tr>
         </table>
 
         <h2 style="font-size:16px;margin-top:24px;">Servicios</h2>

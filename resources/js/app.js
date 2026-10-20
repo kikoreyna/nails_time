@@ -18,7 +18,7 @@ if (bookingForm) {
 		const price = selected.reduce((total, input) => total + Number(input.dataset.price), 0);
 
 		selectedCount.textContent = `${selected.length} ${selected.length === 1 ? 'servicio seleccionado' : 'servicios seleccionados'}`;
-		selectionTotal.textContent = `$${new Intl.NumberFormat('es-MX', { maximumFractionDigits: 0 }).format(price)} · ${minutes} min`;
+		selectionTotal.textContent = `$${new Intl.NumberFormat(bookingForm.dataset.locale, { maximumFractionDigits: 0 }).format(price)} ${bookingForm.dataset.currency} · ${minutes} min`;
 	};
 
 	const renderSlots = (slots, previousSelection) => {

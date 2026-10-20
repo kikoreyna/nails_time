@@ -17,7 +17,7 @@
                     <tr>
                         <td><strong>{{ $appointment->customer_name }}</strong><br>{{ $appointment->customer_phone }}<br>{{ $appointment->customer_email }}</td>
                         <td>{{ $appointment->appointment_date->format('d/m/Y') }} {{ substr($appointment->starts_at, 0, 5) }}<br>{{ $appointment->services->pluck('pivot.service_name')->join(', ') }}<br>{{ $appointment->technician?->name }}</td>
-                        <td>${{ number_format((float) $appointment->deposit_amount, 2) }} de ${{ number_format((float) $appointment->total_price, 2) }}</td>
+                        <td>{{ \App\Enums\Currency::current()->format($appointment->deposit_amount) }} de {{ \App\Enums\Currency::current()->format($appointment->total_price) }}</td>
                         <td>{{ $appointment->expires_at?->timezone(config('booking.timezone'))->format('d/m H:i') }}</td>
                         <td>
                             @if ($appointment->paymentProof)

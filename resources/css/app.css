@@ -191,6 +191,12 @@ button, input { font: inherit; }
 .admin-actions form { display: grid; gap: 6px; }
 .secondary-button { min-height: 40px; padding: 0 16px; border: 1px solid var(--ink); background: transparent; color: var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; }
 .admin-bar { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.icon-actions { display: flex; gap: 6px; }
+.icon-actions form { margin: 0; }
+.icon-button { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; padding: 0; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; text-decoration: none; transition: background-color .15s ease, color .15s ease; }
+.icon-button:hover { background: var(--ink); color: #fff; }
+.icon-button.is-danger:hover { background: var(--tomato); border-color: var(--tomato); }
+.icon-button svg { width: 16px; height: 16px; }
 .admin-shell { display: grid; grid-template-columns: 250px minmax(0, 1fr); min-height: 100vh; }
 .admin-sidebar { position: sticky; top: 0; display: flex; flex-direction: column; gap: 28px; height: 100vh; padding: 24px 18px; background: var(--ink); color: #eef1ec; }
 .admin-sidebar .brand { color: #fff; }
