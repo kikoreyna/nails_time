@@ -10,33 +10,35 @@ use Illuminate\Support\Collection;
 
 class AppointmentAvailability
 {
+    public function __construct(private BusinessSchedule $schedule) {}
+
     /** @param Collection<int, Service> $services */
     public function availableSlots(string $date, Collection $services, ?int $technicianId = null): array
     {
         $duration = (int) $services->sum('duration_minutes');
-        $timezone = (string) config('booking.timezone');
-        $opening = Carbon::parse($date.' '.config('booking.opening_time'), $timezone);
-        $closing = Carbon::parse($date.' '.config('booking.closing_time'), $timezone);
-        $now = Carbon::now($timezone);
+        $interval = (int) config('booking.slot_interval_minutes');
+        $now = Carbon::now((string) config('booking.timezone'));
         $technicians = $this->technicians($technicianId);
         $busy = $this->busyAppointments($date);
         $slots = [];
 
-        for ($slot = $opening->copy(); $slot->copy()->addMinutes($duration)->lessThanOrEqualTo($closing); $slot->addMinutes((int) config('booking.slot_interval_minutes'))) {
-            if ($slot->lessThan($now)) {
-                continue;
+        foreach ($this->schedule->windows($date) as [$opening, $closing]) {
+            for ($slot = $opening->copy(); $slot->copy()->addMinutes($duration)->lessThanOrEqualTo($closing); $slot->addMinutes($interval)) {
+                $end = $slot->copy()->addMinutes($duration);
+
+                if ($slot->lessThan($now) || $this->schedule->isBlocked($slot, $end)) {
+                    continue;
+                }
+
+                if ($this->freeTechnician($technicians, $busy, $slot->format('H:i:s'), $end->format('H:i:s')) === null) {
+                    continue;
+                }
+
+                $slots[] = [
+                    'time' => $slot->format('H:i'),
+                    'end' => $end->format('H:i'),
+                ];
             }
-
-            $end = $slot->copy()->addMinutes($duration);
-
-            if ($this->freeTechnician($technicians, $busy, $slot->format('H:i:s'), $end->format('H:i:s')) === null) {
-                continue;
-            }
-
-            $slots[] = [
-                'time' => $slot->format('H:i'),
-                'end' => $end->format('H:i'),
-            ];
         }
 
         return $slots;
@@ -50,16 +52,20 @@ class AppointmentAvailability
     {
         $timezone = (string) config('booking.timezone');
         $start = Carbon::parse($date.' '.$startTime, $timezone);
-        $opening = Carbon::parse($date.' '.config('booking.opening_time'), $timezone);
-        $closing = Carbon::parse($date.' '.config('booking.closing_time'), $timezone);
         $end = $start->copy()->addMinutes($duration);
         $interval = (int) config('booking.slot_interval_minutes');
 
-        if ($start->lessThan($opening) || $end->greaterThan($closing) || $start->lessThan(Carbon::now($timezone))) {
+        if ($start->lessThan(Carbon::now($timezone)) || $this->schedule->isBlocked($start, $end)) {
             return null;
         }
 
-        if ($opening->diffInMinutes($start) % $interval !== 0) {
+        $fitsWindow = collect($this->schedule->windows($date))->contains(
+            fn (array $window): bool => $start->greaterThanOrEqualTo($window[0])
+                && $end->lessThanOrEqualTo($window[1])
+                && $window[0]->diffInMinutes($start) % $interval === 0
+        );
+
+        if (! $fitsWindow) {
             return null;
         }
 
